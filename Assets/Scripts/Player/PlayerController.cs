@@ -7,7 +7,8 @@ public class PlayerController : MonoBehaviour
 {
     public GameObject playerCam;
 
-    public float walkSpeed = 800.0f;
+    public float walkSpeed = 500.0f;
+    public float jumpSpeed = 300.0f;
 
     protected Rigidbody myRigidbody;
     protected CapsuleCollider myCollider;
@@ -28,7 +29,6 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         MoveCharacter();
-        Debug.Log(IsGrounded());
     }
 
     float GetSpeed()
@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
     bool IsGrounded()
     {
         int _layerMask = ~LayerMask.GetMask("Player");
-        return Physics.CheckCapsule(myCollider.bounds.center, new Vector3(groundCheck.position.x, groundCheck.position.y - myCollider.radius, groundCheck.position.z), myCollider.radius, _layerMask);
+        return Physics.CheckCapsule(myCollider.bounds.center, new Vector3(groundCheck.position.x, groundCheck.position.y + myCollider.radius - 0.01f, groundCheck.position.z), myCollider.radius, _layerMask);
     } 
 
     void MoveCharacter() 
@@ -47,7 +47,8 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.Euler(transform.eulerAngles.x, playerCam.transform.eulerAngles.y, transform.eulerAngles.z);
         if (IsGrounded())
         {
-            myRigidbody.velocity = (transform.forward * GetSpeed() / 100) * inputVec.y;
+            myRigidbody.velocity = ((transform.forward * GetSpeed() / 100) * inputVec.y)
+                                 + ((transform.right * GetSpeed() / 100) * inputVec.x);
         }
     }
     public void OnMove(InputValue input) 
@@ -55,7 +56,10 @@ public class PlayerController : MonoBehaviour
         inputVec = input.Get<Vector2>();
     }
     public void OnJump() 
-    { 
-    
+    {
+        if (IsGrounded())
+        {
+            myRigidbody.AddForce(gameObject.transform.up * jumpSpeed * 100);
+        }
     }
 }
