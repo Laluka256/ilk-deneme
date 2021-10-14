@@ -15,17 +15,17 @@ public class PlayerController : MonoBehaviour
     protected Transform groundCheck;
 
     protected Vector2 inputVec;
+    protected float startRot;
 
-    // Start is called before the first frame update
     void Start()
     {
         playerCam = GameObject.FindWithTag("MainCamera");
         myRigidbody = gameObject.GetComponent<Rigidbody>();
         myCollider = gameObject.GetComponent<CapsuleCollider>();
         groundCheck = gameObject.transform.Find("GroundCheck");
+        startRot = Mathf.Round(gameObject.transform.eulerAngles.y);
     }
 
-    // Update is called once per frame
     void FixedUpdate()
     {
         MoveCharacter();
@@ -44,11 +44,11 @@ public class PlayerController : MonoBehaviour
 
     void MoveCharacter() 
     {
-        transform.rotation = Quaternion.Euler(transform.eulerAngles.x, playerCam.transform.eulerAngles.y, transform.eulerAngles.z);
-        if (IsGrounded())
+        if (inputVec.x != 0.0f) //Check if wasd input is present
         {
-            myRigidbody.velocity = ((transform.forward * GetSpeed() / 100) * inputVec.y)
-                                 + ((transform.right * GetSpeed() / 100) * inputVec.x);
+            //TODO:  duvara doðru yürüdüðümüz zaman aþaðýya düþmek yerine duvarda sabit kalýyor bunu düzelt.
+            transform.rotation = Quaternion.Euler(transform.eulerAngles.x, startRot * -inputVec.x, transform.eulerAngles.z);
+            myRigidbody.velocity = new Vector3((transform.forward * GetSpeed() / 100).x, myRigidbody.velocity.y, myRigidbody.velocity.z);
         }
     }
     public void OnMove(InputValue input) 
